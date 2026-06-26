@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake Job Detector</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: #0f0f1a;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #00d4ff;
+        }
+
+        p.subtitle {
+            color: #aaaaaa;
+            margin-bottom: 40px;
+            font-size: 1rem;
+        }
+
+        .form-container {
+            background: #1a1a2e;
+            padding: 40px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 700px;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #00d4ff;
+            font-weight: 600;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            background: #0f0f1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 0.95rem;
+            resize: vertical;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #00d4ff;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #00d4ff;
+            color: #0f0f1a;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #00b8d9;
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            display: none;
+        }
+
+        .result.fake {
+            background: rgba(255, 50, 50, 0.15);
+            border: 2px solid #ff3232;
+        }
+
+        .result.real {
+            background: rgba(50, 255, 100, 0.15);
+            border: 2px solid #32ff64;
+        }
+
+        .result h2 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .result.fake h2 { color: #ff3232; }
+        .result.real h2 { color: #32ff64; }
+
+        .result p {
+            font-size: 1rem;
+            color: #cccccc;
+        }
+
+        .loading {
+            text-align: center;
+            margin-top: 20px;
+            color: #00d4ff;
+            display: none;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🔍 Fake Job Detector</h1>
+    <p class="subtitle">Paste job details below to check if it's real or fake</p>
+
+    <div class="form-container">
+        <label>Job Title</label>
+        <input type="text" id="title" placeholder="e.g. Software Engineer" />
+
+        <label>Company Profile</label>
+        <textarea id="company_profile" rows="3" placeholder="Brief description of the company..."></textarea>
+
+        <label>Job Description</label>
+        <textarea id="description" rows="4" placeholder="What does the job involve..."></textarea>
+
+        <label>Requirements</label>
+        <textarea id="requirements" rows="3" placeholder="Skills and qualifications needed..."></textarea>
+
+        <button onclick="detectJob()">🔍 Check Job</button>
+
+        <div class="loading" id="loading">⏳ Analyzing job posting...</div>
+
+        <div class="result" id="result">
+            <h2 id="result-title"></h2>
+            <p id="result-confidence"></p>
+        </div>
+    </div>
+
+    <script>
+        async function detectJob() {
+            const title = document.getElementById("title").value;
+            const company_profile = document.getElementById("company_profile").value;
+            const description = document.getElementById("description").value;
+            const requirements = document.getElementById("requirements").value;
+
+            if (!title || !description) {
+                alert("Please fill in at least Job Title and Job Description!");
+                return;
+            }
+
+            // Show loading
+            document.getElementById("loading").style.display = "block";
+            document.getElementById("result").style.display = "none";
+
+            try {
+                const response = await fetch("http://127.0.0.1:8000/predict", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ title, company_profile, description, requirements })
+                });
+
+                const data = await response.json();
+
+                // Hide loading
+                document.getElementById("loading").style.display = "none";
+
+                // Show result
+                const resultDiv = document.getElementById("result");
+                const resultTitle = document.getElementById("result-title");
+                const resultConfidence = document.getElementById("result-confidence");
+
+                resultDiv.style.display = "block";
+                resultDiv.className = "result " + data.result.toLowerCase();
+                resultTitle.textContent = data.result === "FAKE" ? "⚠️ FAKE JOB!" : "✅ REAL JOB!";
+                resultConfidence.textContent = `Confidence: ${data.confidence}`;
+
+            } catch (error) {
+                document.getElementById("loading").style.display = "none";
+                alert("Error connecting to server. Make sure the backend is running!");
+            }
+        }
+    </script>
+
+</body>
+</html>

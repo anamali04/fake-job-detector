@@ -1,201 +1,189 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fake Job Detector</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', sans-serif;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>JobGuard AI - Fake Job Detector</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        body {
-            background: #0f0f1a;
-            color: #ffffff;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 40px 20px;
-        }
+    body { min-height: 100vh; background: #0F172A; font-family: 'Segoe UI', sans-serif; color: #F8FAFC; display: flex; flex-direction: column; }
 
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            color: #00d4ff;
-        }
+    .navbar { display: flex; align-items: center; justify-content: space-between; padding: 16px 32px; background: #0F172A; border-bottom: 0.5px solid #1E293B; }
+    .nav-left { display: flex; align-items: center; gap: 10px; }
+    .nav-icon { width: 36px; height: 36px; border-radius: 10px; background: #3B82F6; display: flex; align-items: center; justify-content: center; }
+    .nav-icon i { color: #fff; font-size: 18px; }
+    .nav-title { font-size: 16px; font-weight: 500; color: #F8FAFC; }
+    .nav-pill { font-size: 11px; padding: 3px 12px; border-radius: 20px; background: rgba(59,130,246,0.15); color: #3B82F6; border: 0.5px solid rgba(59,130,246,0.3); }
 
-        p.subtitle {
-            color: #aaaaaa;
-            margin-bottom: 40px;
-            font-size: 1rem;
-        }
+    .hero { text-align: center; padding: 48px 24px 32px; background: #0F172A; }
+    .hero-badge { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 18px; font-size: 12px; padding: 4px 14px; border-radius: 20px; background: rgba(59,130,246,0.1); color: #3B82F6; border: 0.5px solid rgba(59,130,246,0.25); }
+    .hero h1 { font-size: 34px; font-weight: 500; color: #F8FAFC; line-height: 1.25; margin-bottom: 12px; }
+    .hero h1 span { color: #3B82F6; }
+    .hero p { font-size: 15px; color: #94A3B8; max-width: 460px; margin: 0 auto; }
 
-        .form-container {
-            background: #1a1a2e;
-            padding: 40px;
-            border-radius: 16px;
-            width: 100%;
-            max-width: 700px;
-            box-shadow: 0 0 30px rgba(0, 212, 255, 0.1);
-        }
+    .stats { display: flex; justify-content: center; border-top: 0.5px solid #1E293B; border-bottom: 0.5px solid #1E293B; background: #0F172A; }
+    .stat { flex: 1; max-width: 160px; text-align: center; padding: 18px 12px; border-right: 0.5px solid #1E293B; }
+    .stat:last-child { border-right: none; }
+    .stat-num { font-size: 22px; font-weight: 500; color: #3B82F6; }
+    .stat-label { font-size: 12px; color: #94A3B8; margin-top: 2px; }
 
-        label {
-            display: block;
-            margin-bottom: 6px;
-            color: #00d4ff;
-            font-weight: 600;
-        }
+    .main { padding: 28px 24px 40px; max-width: 700px; margin: 0 auto; width: 100%; }
 
-        input, textarea {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 20px;
-            background: #0f0f1a;
-            border: 1px solid #333;
-            border-radius: 8px;
-            color: #ffffff;
-            font-size: 0.95rem;
-            resize: vertical;
-        }
+    .card { background: #1E293B; border: 0.5px solid #334155; border-radius: 16px; padding: 28px; margin-bottom: 16px; }
+    .card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 22px; font-size: 12px; font-weight: 500; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.08em; }
+    .card-header i { color: #3B82F6; font-size: 16px; }
 
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: #00d4ff;
-        }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .fg { display: flex; flex-direction: column; gap: 6px; }
+    .fg.full { grid-column: 1 / -1; }
+    .fg label { font-size: 13px; color: #94A3B8; font-weight: 500; }
+    .fg input, .fg textarea { background: #0F172A; border: 0.5px solid #334155; border-radius: 10px; padding: 11px 14px; color: #F8FAFC; font-size: 14px; font-family: 'Segoe UI', sans-serif; resize: vertical; outline: none; transition: border-color 0.2s; }
+    .fg input:focus, .fg textarea:focus { border-color: #3B82F6; }
+    .fg input::placeholder, .fg textarea::placeholder { color: #334155; }
 
-        button {
-            width: 100%;
-            padding: 14px;
-            background: #00d4ff;
-            color: #0f0f1a;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.3s;
-        }
+    .btn { width: 100%; margin-top: 10px; padding: 14px; border: none; border-radius: 12px; background: #3B82F6; color: #fff; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.2s; }
+    .btn:hover { background: #2563EB; }
+    .btn i { font-size: 18px; }
 
-        button:hover {
-            background: #00b8d9;
-        }
+    .loading { display: none; text-align: center; padding: 28px; }
+    .spinner { width: 30px; height: 30px; border: 2px solid #1E293B; border-top-color: #3B82F6; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading p { font-size: 14px; color: #94A3B8; }
 
-        .result {
-            margin-top: 30px;
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-            display: none;
-        }
+    .result { display: none; border-radius: 16px; padding: 28px; margin-bottom: 16px; text-align: center; }
+    .result.fake { background: rgba(239,68,68,0.08); border: 0.5px solid rgba(239,68,68,0.3); }
+    .result.real { background: rgba(34,197,94,0.08); border: 0.5px solid rgba(34,197,94,0.3); }
+    .result-emoji { font-size: 44px; margin-bottom: 12px; }
+    .result-label { font-size: 26px; font-weight: 500; margin-bottom: 6px; }
+    .result.fake .result-label { color: #EF4444; }
+    .result.real .result-label { color: #22C55E; }
+    .result-sub { font-size: 14px; color: #94A3B8; margin-bottom: 20px; }
+    .bar-wrap { background: #0F172A; border-radius: 8px; height: 8px; overflow: hidden; margin-bottom: 6px; }
+    .bar { height: 100%; border-radius: 8px; width: 0%; transition: width 1s ease; }
+    .result.fake .bar { background: #EF4444; }
+    .result.real .bar { background: #22C55E; }
+    .bar-label { font-size: 12px; color: #94A3B8; }
 
-        .result.fake {
-            background: rgba(255, 50, 50, 0.15);
-            border: 2px solid #ff3232;
-        }
+    .tips { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .tip { background: #1E293B; border: 0.5px solid #334155; border-radius: 12px; padding: 14px; display: flex; align-items: flex-start; gap: 10px; }
+    .tip i { color: #3B82F6; font-size: 17px; flex-shrink: 0; margin-top: 1px; }
+    .tip-body { font-size: 12px; color: #94A3B8; line-height: 1.5; }
+    .tip-body strong { display: block; color: #F8FAFC; font-size: 13px; margin-bottom: 2px; font-weight: 500; }
 
-        .result.real {
-            background: rgba(50, 255, 100, 0.15);
-            border: 2px solid #32ff64;
-        }
-
-        .result h2 {
-            font-size: 2rem;
-            margin-bottom: 10px;
-        }
-
-        .result.fake h2 { color: #ff3232; }
-        .result.real h2 { color: #32ff64; }
-
-        .result p {
-            font-size: 1rem;
-            color: #cccccc;
-        }
-
-        .loading {
-            text-align: center;
-            margin-top: 20px;
-            color: #00d4ff;
-            display: none;
-            font-size: 1rem;
-        }
-    </style>
+    .footer { text-align: center; padding: 20px; margin-top: auto; font-size: 12px; color: #334155; border-top: 0.5px solid #1E293B; }
+  </style>
 </head>
 <body>
 
-    <h1>🔍 Fake Job Detector</h1>
-    <p class="subtitle">Paste job details below to check if it's real or fake</p>
+  <nav class="navbar">
+    <div class="nav-left">
+      <div class="nav-icon"><i class="ti ti-shield-search"></i></div>
+      <span class="nav-title">JobGuard AI</span>
+    </div>
+    <span class="nav-pill">ML Powered</span>
+  </nav>
 
-    <div class="form-container">
-        <label>Job Title</label>
-        <input type="text" id="title" placeholder="e.g. Software Engineer" />
+  <div class="hero">
+    <div class="hero-badge"><i class="ti ti-sparkles"></i> AI-Powered Detection</div>
+    <h1>Spot <span>Fake Jobs</span><br/>Before They Fool You</h1>
+    <p>Paste any job listing below. Our ML model analyzes it instantly with 98% accuracy.</p>
+  </div>
 
-        <label>Company Profile</label>
-        <textarea id="company_profile" rows="3" placeholder="Brief description of the company..."></textarea>
+  <div class="stats">
+    <div class="stat"><div class="stat-num">98%</div><div class="stat-label">Accuracy</div></div>
+    <div class="stat"><div class="stat-num">17K+</div><div class="stat-label">Jobs trained on</div></div>
+    <div class="stat"><div class="stat-num">&lt;1s</div><div class="stat-label">Detection time</div></div>
+    <div class="stat"><div class="stat-num">Free</div><div class="stat-label">Always</div></div>
+  </div>
 
-        <label>Job Description</label>
-        <textarea id="description" rows="4" placeholder="What does the job involve..."></textarea>
-
-        <label>Requirements</label>
-        <textarea id="requirements" rows="3" placeholder="Skills and qualifications needed..."></textarea>
-
-        <button onclick="detectJob()">🔍 Check Job</button>
-
-        <div class="loading" id="loading">⏳ Analyzing job posting...</div>
-
-        <div class="result" id="result">
-            <h2 id="result-title"></h2>
-            <p id="result-confidence"></p>
+  <div class="main">
+    <div class="card">
+      <div class="card-header"><i class="ti ti-file-description"></i> Job details</div>
+      <div class="form-grid">
+        <div class="fg">
+          <label>Job title</label>
+          <input type="text" id="title" placeholder="e.g. Software Engineer" />
         </div>
+        <div class="fg">
+          <label>Company profile</label>
+          <input type="text" id="company_profile" placeholder="Brief company description" />
+        </div>
+        <div class="fg full">
+          <label>Job description</label>
+          <textarea id="description" rows="4" placeholder="What does the role involve..."></textarea>
+        </div>
+        <div class="fg full">
+          <label>Requirements</label>
+          <textarea id="requirements" rows="3" placeholder="Skills and qualifications needed..."></textarea>
+        </div>
+      </div>
+      <button class="btn" onclick="detectJob()">
+        <i class="ti ti-shield-search"></i> Analyze job posting
+      </button>
     </div>
 
-    <script>
-        async function detectJob() {
-            const title = document.getElementById("title").value;
-            const company_profile = document.getElementById("company_profile").value;
-            const description = document.getElementById("description").value;
-            const requirements = document.getElementById("requirements").value;
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <p>Analyzing job posting...</p>
+    </div>
 
-            if (!title || !description) {
-                alert("Please fill in at least Job Title and Job Description!");
-                return;
-            }
+    <div class="result" id="result">
+      <div class="result-emoji" id="r-emoji"></div>
+      <div class="result-label" id="r-label"></div>
+      <div class="result-sub" id="r-sub"></div>
+      <div class="bar-wrap"><div class="bar" id="r-bar"></div></div>
+      <div class="bar-label" id="r-bar-label"></div>
+    </div>
 
-            // Show loading
-            document.getElementById("loading").style.display = "block";
-            document.getElementById("result").style.display = "none";
+    <div class="tips">
+      <div class="tip"><i class="ti ti-alert-triangle"></i><div class="tip-body"><strong>Watch out for</strong>Unrealistic salaries, vague descriptions, upfront fees</div></div>
+      <div class="tip"><i class="ti ti-building"></i><div class="tip-body"><strong>Verify the company</strong>Check LinkedIn, official site, and Google reviews</div></div>
+      <div class="tip"><i class="ti ti-mail"></i><div class="tip-body"><strong>Suspicious emails</strong>Real companies use official domain emails only</div></div>
+      <div class="tip"><i class="ti ti-lock"></i><div class="tip-body"><strong>Never share</strong>Bank details or personal ID before an interview</div></div>
+    </div>
+  </div>
 
-            try {
-                const response = await fetch("http://127.0.0.1:8000/predict", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ title, company_profile, description, requirements })
-                });
+  <div class="footer">JobGuard AI &mdash; Built with FastAPI and Random Forest ML</div>
 
-                const data = await response.json();
+  <script>
+    async function detectJob() {
+      const title = document.getElementById('title').value;
+      const company_profile = document.getElementById('company_profile').value;
+      const description = document.getElementById('description').value;
+      const requirements = document.getElementById('requirements').value;
 
-                // Hide loading
-                document.getElementById("loading").style.display = "none";
+      if (!title || !description) { alert('Please fill in at least Job Title and Job Description!'); return; }
 
-                // Show result
-                const resultDiv = document.getElementById("result");
-                const resultTitle = document.getElementById("result-title");
-                const resultConfidence = document.getElementById("result-confidence");
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('result').style.display = 'none';
 
-                resultDiv.style.display = "block";
-                resultDiv.className = "result " + data.result.toLowerCase();
-                resultTitle.textContent = data.result === "FAKE" ? "⚠️ FAKE JOB!" : "✅ REAL JOB!";
-                resultConfidence.textContent = `Confidence: ${data.confidence}`;
+      try {
+        const res = await fetch('http://127.0.0.1:8000/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, company_profile, description, requirements })
+        });
+        const data = await res.json();
+        document.getElementById('loading').style.display = 'none';
 
-            } catch (error) {
-                document.getElementById("loading").style.display = "none";
-                alert("Error connecting to server. Make sure the backend is running!");
-            }
-        }
-    </script>
+        const isFake = data.result === 'FAKE';
+        const conf = parseFloat(data.confidence);
+        const rDiv = document.getElementById('result');
+        rDiv.className = 'result ' + (isFake ? 'fake' : 'real');
+        rDiv.style.display = 'block';
+        document.getElementById('r-emoji').textContent = isFake ? '🚨' : '✅';
+        document.getElementById('r-label').textContent = isFake ? 'Fake job detected' : 'Looks like a real job';
+        document.getElementById('r-sub').textContent = 'Our model analyzed this posting with ' + data.confidence + ' confidence';
+        document.getElementById('r-bar-label').textContent = conf + '% confidence score';
+        setTimeout(() => { document.getElementById('r-bar').style.width = conf + '%'; }, 100);
+      } catch(e) {
+        document.getElementById('loading').style.display = 'none';
+        alert('Error connecting to server. Make sure the backend is running!');
+      }
+    }
+  </script>
 
 </body>
 </html>
